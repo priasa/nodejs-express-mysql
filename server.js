@@ -1,20 +1,73 @@
+const http = require('http');
+const webServerConfig = require('./app/config/webserver.js');
 const express = require("express");
 const sql = require("./app/models/db");
 const app = express();
 
-//parser request content-type : application/json
-app.use(express.json());
-app.use(
-  express.urlencoded({
-    extended: true,
-  })
-);
+let httpServer;
+async function startup() {
+  console.log('Starting application');
+  try {
+      console.log('Initializing web server module');
+      httpServer = http.createServer(app);
+      app.use(express.json());
+      app.use(
+          express.urlencoded({
+              extended: true,
+          })
+      );
 
-app.get("/", (request, response) => {
-    response.json({"message" : "welcome to Bezkoder Application"})
-});
+      //parser request content-type : application/json
+      app.get("/", (request, response) => {
+        response.json({"message" : "welcome to Bezkoder Application"})
+      });
+      
+      const customerRoute = require("./app/routes/customer.routes")(app);
 
-const customerRoute = require("./app/routes/customer.routes")(app);
+      httpServer.listen(webServerConfig.port)
+          .on('listening', () => {
+              console.log(`Web server listening on localhost:${webServerConfig.port}`);
+          })
+          .on('error', err => {
+          });
+
+  } catch (err) {
+      console.error(err);
+      process.exit(1); // Non-zero failure code
+  }
+}
+startup();
+
+async function shutdown(e) {
+  let err = e;
+  console.log('Shutting down application');
+  try {
+      console.log('Closing web server module');
+      await closeHttpServer();
+  } catch (e) {
+      console.error(e);
+      err = err || e;
+  }
+
+  console.log('Exiting process');
+  if (err) {
+      process.exit(1);
+  } else {
+      process.exit(0);
+  }
+}
+
+function closeHttpServer() {
+  return new Promise((resolve, reject) => {
+      httpServer.close((err) => {
+          if (err) {
+              reject(err);
+              return;
+          }
+          resolve();
+      });
+  });
+}
 
 process.once('SIGTERM', () => {
   console.log('Received SIGTERM');
@@ -31,22 +84,3 @@ process.once('uncaughtException', err => {
   console.error(err);
   shutdown(err);
 });
-
-async function shutdown(e) {
-  let err = e;
-  console.log('Shutting down application');
-  app.close;
-  try {
-    console.log('Closing database module');
-    sql.end();
-  } catch (e) {
-    console.error(e);
-    err = err || e;
-  }
-  console.log('Exiting process');
-  process.exit();
-}
-
-app.listen(3000, () => {
-    console.log("Server is running on port 3000.")
-})

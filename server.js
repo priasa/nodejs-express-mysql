@@ -3,12 +3,14 @@ const webServerConfig = require('./app/config/webserver.js');
 const express = require("express");
 const sql = require("./app/models/db");
 const app = express();
+const cors = require('cors')
 
 let httpServer;
 async function startup() {
   console.log('Starting application');
   try {
       console.log('Initializing web server module');
+
       httpServer = http.createServer(app);
       app.use(express.json());
       app.use(
@@ -17,12 +19,19 @@ async function startup() {
           })
       );
 
+      app.use(cors({
+        origin: '*',
+        methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH']
+      }));
+
       //parser request content-type : application/json
       app.get("/", (request, response) => {
         response.json({"message" : "welcome to Bezkoder Application"})
       });
       
       const customerRoute = require("./app/routes/customer.routes")(app);
+      const userRoute = require("./app/routes/user.routes")(app);
+      const loginRoute = require("./app/routes/login.routes")(app);
 
       httpServer.listen(webServerConfig.port)
           .on('listening', () => {

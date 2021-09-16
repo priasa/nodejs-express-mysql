@@ -29,9 +29,9 @@ async function startup() {
         response.json({"message" : "welcome to Bezkoder Application"})
       });
       
-      const customerRoute = require("./app/routes/customer.routes")(app);
-      const userRoute = require("./app/routes/user.routes")(app);
-      const loginRoute = require("./app/routes/login.routes")(app);
+      const customerRoute = require("./app/routes/customer.route")(app);
+      const userRoute = require("./app/routes/user.route")(app);
+      const loginRoute = require("./app/routes/login.route")(app);
 
       httpServer.listen(webServerConfig.port)
           .on('listening', () => {

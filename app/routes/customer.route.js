@@ -11,15 +11,15 @@ module.exports = function (app) {
   });
 
   // Create a new Customer
-  app.post("/customers", [auth.verifyToken], customers.create);
+  app.post("/customers", [auth.verifyToken], customers.doCreate);
   // Retrieve all Customers
-  app.get("/customers", [auth.verifyToken], customers.findAll);
+  app.get("/customers", [auth.verifyToken], customers.doFindAll);
   // Retrieve a single Customer with customerId
-  app.get("/customers/:customerId", [auth.verifyToken], customers.findOne);
+  app.get("/customers/:customerId", [auth.verifyToken], customers.doFindOne);
   // Update a Customer with customerId
-  app.put("/customers/:customerId", [auth.verifyToken], customers.update);
+  app.put("/customers/:customerId", [auth.verifyToken], customers.doUpdate);
   // Delete a Customer with customerId
-  app.delete("/customers/:customerId", [auth.verifyToken], customers.delete);
+  app.delete("/customers/:customerId", [auth.verifyToken], customers.doDelete);
   // Create a new Customer
-  app.delete("/customers", [auth.verifyToken], customers.deleteAll);
+  app.delete("/customers", [auth.verifyToken], customers.doDeleteAll);
 };

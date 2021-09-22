@@ -1,14 +1,16 @@
 const User = require("../models/user.model");
+const userService = require("../services/user.service")
 const uuid = require("uuid");
 const bcrypt = require("bcryptjs");
 
-exports.create = (req, res) => {
+doCreateUser = async (req, res) => {
   // Validate request
   if (!req.body) {
     res.status(400).send({
       message: "Content can not be empty!",
     });
   }
+
   // Create a User
   const user = new User({
     email: req.body.email,
@@ -16,13 +18,20 @@ exports.create = (req, res) => {
     id: uuid.v4()
   });
 
-  // Save User in the database
-  User.create(user, (err, data) => {
-    if (err)
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while creating the Customer.",
-      });
-    else res.status(201).send({message : 'Username '.concat(user.email, ' has been created' )});
-  });
-};
+  try {
+    var newUser = await userService.createUser(user);
+    console.log("created user: ", { id: res.insertId, ...newUser });
+    res.status(201).send({message : 'Username '.concat(user.email, ' has been created' )});
+  } catch(err) {
+    res.status(500).send({
+      message:
+        err.message || "Some error occurred while creating the Customer.",
+    });
+  }
+}
+
+const userController = {
+  doCreateUser: doCreateUser
+}
+
+module.exports = userController

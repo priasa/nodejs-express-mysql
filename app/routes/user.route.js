@@ -10,5 +10,5 @@ module.exports = function (app) {
   });
 
   // Create a new Customer
-  app.post("/users", users.create);
+  app.post("/users", users.doCreateUser);
 };
